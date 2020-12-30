@@ -179,28 +179,28 @@
 ;; Questo predicato è vero quando lo heap heap-id non contiene elementi.
 (defun heap-empty (heap-id)
     (cond 
-        ((gethash heap-id *heaps*)
-            (cond
-                ((= (heap-size heap-id) 0))))
-        (t (error "Lo heap specificato non esiste."))))
+        ((not (gethash heap-id *heaps*))
+            (error "Lo heap specificato non esiste.")))
+    (cond
+        ((= (heap-size heap-id) 0))))
 
 ;; Questo predicato è vero quando lo heap heap-id contiene almeno un elemento.
 (defun heap-not-empty (heap-id)
     (cond 
-        ((gethash heap-id *heaps*)
-            (cond
-                ((= (heap-size heap-id) 0) nil)
-                (t t)))
-        (t (error "Lo heap specificato non esiste."))))
+        ((not (gethash heap-id *heaps*))
+            (error "Lo heap specificato non esiste.")))
+    (cond
+        ((= (heap-size heap-id) 0) nil)
+        (t t)))
 
 ;; Ritorna una lista di due elementi dove K è la chiave minima e V il valore associato.
 (defun heap-head (heap-id)
     (cond 
-        ((gethash heap-id *heaps*)
-            (cond
-                ((heap-not-empty heap-id) (aref (heap-actual-heap heap-id) 0))
-                (t (error "Lo heap specificato e' vuoto."))))
-        (t (error "Lo heap specificato non esiste."))))
+        ((not (gethash heap-id *heaps*))
+            (error "Lo heap specificato non esiste."))
+        ((heap-empty heap-id)
+            (error "Lo heap specificato e' vuoto.")))
+    (aref (heap-actual-heap heap-id) 0))
 
 ;; La funzione heap-insert inserisce l’elemento V nello heap heap-id con chiave K.
 (defun heapify-insert (heap-id index)
@@ -218,7 +218,15 @@
 (defun heap-insert (heap-id K V)
     (cond 
         ((not (gethash heap-id *heaps*))
-            (new-heap heap-id)))
+            (new-heap heap-id))
+        ((= (heap-size heap-id) (length (heap-actual-heap heap-id)))
+            (setf
+                (gethash heap-id *heaps*)
+                (list 'heap heap-id 
+                    (heap-size heap-id)
+                    (adjust-array 
+                        (heap-actual-heap heap-id) 
+                        (+ (heap-size heap-id) 1))))))
     (setf 
         (aref 
             (heap-actual-heap heap-id)
@@ -312,16 +320,16 @@
 ;; Stampa sulla console lo stato interno dello heap heap-id.
 (defun heap-print (heap-id)
     (cond 
-        ((gethash heap-id *heaps*)
-            (let ((heap-entries ()))
-                (mapheap 
-                    #'(lambda (heap-entry index) 
-                        (push (cons index heap-entry) heap-entries))
-                    (heap-actual-heap heap-id)
-                    (heap-size heap-id))
-                (print (reverse heap-entries)))
-                t)
-        (t (error "Lo heap specificato non esiste."))))
+        ((not (gethash heap-id *heaps*))
+            (error "Lo heap specificato non esiste.")))
+    (let ((heap-entries ()))
+        (mapheap 
+            #'(lambda (heap-entry index) 
+                (push (cons index heap-entry) heap-entries))
+            (heap-actual-heap heap-id)
+            (heap-size heap-id))
+        (print (reverse heap-entries)))
+        t)
 
 ;; Test
 (heap-insert 'heap 3 3)
