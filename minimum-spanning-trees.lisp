@@ -161,22 +161,6 @@
 (defun graph-print (graph-id)
     (append (graph-vertices graph-id) (graph-arcs graph-id)))
 
-;; Test
-(new-arc 'grafo 'a 'b 4)
-(new-arc 'grafo 'a 'h 8)
-(new-arc 'grafo 'b 'c 8)
-(new-arc 'grafo 'b 'h 11)
-(new-arc 'grafo 'c 'd 7)
-(new-arc 'grafo 'c 'f 4)
-(new-arc 'grafo 'c 'i 2)
-(new-arc 'grafo 'd 'e 9)
-(new-arc 'grafo 'd 'f 14)
-(new-arc 'grafo 'e 'f 10)
-(new-arc 'grafo 'f 'g 2)
-(new-arc 'grafo 'g 'h 1)
-(new-arc 'grafo 'g 'i 6)
-(new-arc 'grafo 'h 'i 7)
-
 ;; Heap
 (defparameter *heaps* 
     (make-hash-table :test #'equal))
