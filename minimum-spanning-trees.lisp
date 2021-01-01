@@ -170,6 +170,9 @@
 (defun heap-delete (heap-id)
     (remhash heap-id *heaps*))
 
+;; TODO: Forse c'è da implementare anche heap-id? (e nel caso heap-size ed heap-actual-heap potrebbbero essere sbagliate,
+;;       in quanto dovrebbero prendere non l'id ma heap-rep)
+
 ;; Ritorna la dimensione dello heap
 (defun heap-size (heap-id)
     (car (cdr (cdr (gethash heap-id *heaps*)))))
@@ -334,6 +337,7 @@
         t)
 
 ;; Minimum Spanning Trees
+;; TODO: Modificare vertex-key e previous in modo che il primo elemento della chiave sia rispettivamente vertex-key e vertex-previuos 
 (defparameter *vertex-key* 
     (make-hash-table :test #'equal))
 
@@ -400,6 +404,63 @@
     (setf (gethash (list graph-id source) *previous*) nil)
     (mst-build-tree graph-id))
 
+(defun a ()
+    (maphash
+        #'(lambda (key value)
+            (print (cons key value)))
+        *vertex-key*)
+    (maphash
+        #'(lambda (key value)
+            (print (cons key value)))
+        *previous*))
+
 ;; Questa funzione ritorna una lista degli archi del MST ordinata secondo un attraversamento 
 ;; preorder dello stesso, fatta rispetto al peso dell’arco. 
-;; (defun mst-get (graph-id source))
+(defun mst-get-childs (graph-id node)
+    (let ((childs ()))
+        (maphash 
+            #'(lambda (key value) 
+            (cond 
+                ((string= graph-id (car key)) 
+                (cond 
+                    ((string= node value) 
+                    (push (list (car (cdr key)) 
+                            (gethash (list graph-id (car (cdr key))) 
+                                *vertex-key*))
+                        childs))))))
+            *previous*)
+        childs))
+
+(defun mst-sort-childs (x y)
+    (cond 
+        ((> (car (cdr x)) (car (cdr y))) t)
+        ((= (car (cdr x)) (car (cdr y)))
+            (cond 
+                ((string> (car x) (car y)) t)))))
+
+(defun graph-find-arc (graph-id source-vertex-id dest-vertex-id weight)
+    (or (gethash (list 'arc graph-id source-vertex-id dest-vertex-id weight) 
+            *arcs*)
+        (gethash (list 'arc graph-id dest-vertex-id source-vertex-id weight) 
+            *arcs*)))
+
+(defun mst-preorder-tree (graph-id source childs preorder-tree)
+    (cond 
+        ((not (null (car childs)))
+            (let ((sub-tree (mst-preorder-tree graph-id (car (car childs))
+                (sort (mst-get-childs graph-id (car (car childs))) 'mst-sort-childs)
+                preorder-tree)))
+                (push (graph-find-arc graph-id source 
+                    (car (car childs)) (car (cdr (car childs)))) sub-tree)
+                (cond 
+                    ((not (null (cdr childs)))
+                    (mst-preorder-tree graph-id source (cdr childs) sub-tree))
+                (t sub-tree))))
+        (t preorder-tree)))
+
+(defun mst-get (graph-id source)
+    (cond 
+        ((not (is-graph graph-id))
+            (error "Il grafo specificato non esiste.")))
+    (mst-preorder-tree graph-id source 
+        (sort (mst-get-childs graph-id source) 'mst-sort-childs) ()))
