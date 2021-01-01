@@ -100,16 +100,16 @@
                 (cond 
                     ((string= graph-id (car (cdr (car hash-entry)))) 
                         (cond 
-                            ((stringp vertex-id)
+                            ((numberp vertex-id)
                                 (cond
-                                    ((string= vertex-id (car (cdr (cdr (car hash-entry))))) 
-                                        (push (car hash-entry) neighbors))
-                                    ((string= vertex-id (car (cdr (cdr (cdr (car hash-entry)))))) 
-                                        (push (car hash-entry) neighbors))))
-                                (t (cond
                                     ((= vertex-id (car (cdr (cdr (car hash-entry))))) 
                                         (push (car hash-entry) neighbors))
                                     ((= vertex-id (car (cdr (cdr (cdr (car hash-entry)))))) 
+                                        (push (car hash-entry) neighbors))))
+                                (t (cond
+                                    ((string= vertex-id (car (cdr (cdr (car hash-entry))))) 
+                                        (push (car hash-entry) neighbors))
+                                    ((string= vertex-id (car (cdr (cdr (cdr (car hash-entry)))))) 
                                         (push (car hash-entry) neighbors))))))))
             *arcs*)
         neighbors))
@@ -127,28 +127,28 @@
                 (cond 
                     ((string= graph-id (car (cdr (car hash-entry)))) 
                         (cond
-                            ((stringp vertex-id)
+                            ((numberp vertex-id)
                                 (cond 
-                                    ((string= vertex-id (car (cdr (cdr (car hash-entry))))) 
+                                    ((= vertex-id (car (cdr (cdr (car hash-entry))))) 
                                         (push 
                                             (gethash 
                                                 (list 'vertex graph-id (car (cdr (cdr (cdr (car hash-entry)))))) 
                                                 *vertices*) 
                                             adjacent))
-                                    ((string= vertex-id (car (cdr (cdr (cdr (car hash-entry)))))) 
+                                    ((= vertex-id (car (cdr (cdr (cdr (car hash-entry)))))) 
                                         (push 
                                             (gethash 
                                                 (list 'vertex graph-id (car (cdr (cdr (car hash-entry))))) 
                                                 *vertices*) 
                                             adjacent))))
                             (t (cond 
-                                ((= vertex-id (car (cdr (cdr (car hash-entry))))) 
+                                ((string= vertex-id (car (cdr (cdr (car hash-entry))))) 
                                     (push 
                                         (gethash 
                                             (list 'vertex graph-id (car (cdr (cdr (cdr (car hash-entry)))))) 
                                             *vertices*) 
                                         adjacent))
-                                ((= vertex-id (car (cdr (cdr (cdr (car hash-entry)))))) 
+                                ((string= vertex-id (car (cdr (cdr (cdr (car hash-entry)))))) 
                                     (push 
                                         (gethash 
                                             (list 'vertex graph-id (car (cdr (cdr (car hash-entry))))) 
@@ -315,9 +315,9 @@
                 (cond
                     ((= (car heap-entry) old-key)
                         (cond
-                            ((stringp V) 
+                            ((numberp V) 
                                 (cond
-                                    ((string= (car (cdr heap-entry)) V)
+                                    ((= (car (cdr heap-entry)) V)
                                         (setf
                                             (aref (heap-actual-heap heap-id) index)
                                             (list new-key V))
@@ -328,7 +328,7 @@
                                                 (heapify (heap-actual-heap heap-id)
                                                     index (heap-size heap-id)))))))
                             (t (cond
-                                    ((= (car (cdr heap-entry)) V)
+                                    ((string= (car (cdr heap-entry)) V)
                                         (setf
                                             (aref (heap-actual-heap heap-id) index)
                                             (list new-key V))
@@ -380,13 +380,13 @@
     (cond
         ((< index size)
             (cond
-                ((stringp value)
+                ((numberp value)
                     (cond
-                        ((string= value (car (cdr (aref heap index)))) (car (aref heap index)))
+                        ((= value (car (cdr (aref heap index)))) (car (aref heap index)))
                         (t (heap-value-exists heap size value (+ index 1)))))
-            (t (cond
-                ((= value (car (cdr (aref heap index)))) (car (aref heap index)))
-                (t (heap-value-exists heap size value (+ index 1)))))))))
+                (t (cond
+                    ((string= value (car (cdr (aref heap index)))) (car (aref heap index)))
+                    (t (heap-value-exists heap size value (+ index 1)))))))))
 
 (defun mst-update-node (graph-id vertex-id parent-id weight)
     (let ((old-key (heap-value-exists (heap-actual-heap graph-id) (heap-size graph-id) vertex-id)))
@@ -403,15 +403,15 @@
                 (mapc
                     #'(lambda (arc)
                         (cond
-                            ((stringp head)
+                            ((numberp head)
                                 (cond
-                                    ((string= (car (cdr (cdr arc))) head)
+                                    ((= (car (cdr (cdr arc))) head)
                                         (mst-update-node graph-id (car (cdr (cdr (cdr arc))))
                                             head (car (cdr (cdr (cdr (cdr arc)))))))
                                     (t (mst-update-node graph-id (car (cdr (cdr arc)))
                                         head (car (cdr (cdr (cdr (cdr arc)))))))))
                             (t (cond
-                                ((= (car (cdr (cdr arc))) head)
+                                ((string= (car (cdr (cdr arc))) head)
                                     (mst-update-node graph-id (car (cdr (cdr (cdr arc))))
                                         head (car (cdr (cdr (cdr (cdr arc)))))))
                                 (t (mst-update-node graph-id (car (cdr (cdr arc)))
@@ -456,15 +456,15 @@
                     (cond 
                         ((string= graph-id (car key))
                             (cond 
-                                ((stringp node)
+                                ((numberp node)
                                     (cond
-                                        ((string= node value) 
+                                        ((= node value) 
                                         (push (list (car (cdr key)) 
                                                 (gethash (list graph-id (car (cdr key))) 
                                                     *vertex-key*))
                                             childs))))
                                 (t (cond
-                                    ((= node value) 
+                                    ((string= node value) 
                                         (push (list (car (cdr key)) 
                                                 (gethash (list graph-id (car (cdr key))) 
                                                     *vertex-key*))
@@ -477,11 +477,11 @@
         ((> (car (cdr x)) (car (cdr y))) t)
         ((= (car (cdr x)) (car (cdr y)))
             (cond 
-                ((stringp (car x))
+                ((numberp (car x))
                     (cond
-                        ((string> (car x) (car y)) t)))
+                        ((> (car x) (car y)) t)))
                 (t (cond 
-                    ((> (car x) (car y)) t)))))))
+                    ((string> (car x) (car y)) t)))))))
 
 (defun graph-find-arc (graph-id source-vertex-id dest-vertex-id weight)
     (or (gethash (list 'arc graph-id source-vertex-id dest-vertex-id weight) 
