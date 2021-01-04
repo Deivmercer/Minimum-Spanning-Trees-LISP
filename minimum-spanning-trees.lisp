@@ -8,9 +8,6 @@
 (defparameter *graphs* 
     (make-hash-table :test #'equal))
 
-(defparameter *visited* 
-    (make-hash-table :test #'equal))
-
 ;; Ritorna il graph-id stesso se questo grafo è già stato creato, oppure NIL se no.  
 (defun is-graph (graph-id)
     (cond
@@ -28,13 +25,13 @@
     (maphash 
         #'(lambda (&rest hash-entry) 
             (cond 
-                ((string= graph-id (car (cdr (car hash-entry))))
+                ((string= graph-id (car (car hash-entry)))
                     (remhash (car hash-entry) *vertices*))))
         *vertices*)
     (maphash 
         #'(lambda (&rest hash-entry) 
             (cond 
-                ((string= graph-id (car (cdr (car hash-entry))))
+                ((string= graph-id (car (car hash-entry)))
                     (remhash (car hash-entry) *arcs*))))
         *arcs*))
 
@@ -44,7 +41,7 @@
         ((not (is-graph graph-id))
             (new-graph graph-id)))
     (setf 
-        (gethash (list 'vertex graph-id vertex-id) *vertices*)
+        (gethash (list graph-id vertex-id) *vertices*)
         (list 'vertex graph-id vertex-id)))
 
 ;; Ritorna una lista di vertici del grafo.
@@ -54,23 +51,28 @@
             (error "Il grafo specificato non esiste.")))
     (let ((vertices ()))
         (maphash 
-            #'(lambda (&rest hash-entry) 
+            #'(lambda (key value) 
                 (cond 
-                    ((string= graph-id (car (cdr (car hash-entry))))
-                        (push (car hash-entry) vertices))))
+                    ((string= graph-id (car key))
+                        (push value vertices))))
             *vertices*)
         vertices))
 
 ;; Aggiunge un arco del grafo graph-id nella hash-table *arcs*.
 (defun new-arc (graph-id source-vertex-id dest-vertex-id &optional (weight 0))
     (cond 
-        ((not (gethash (list 'vertex graph-id source-vertex-id) *vertices*))
+        ((not (gethash (list graph-id source-vertex-id) *vertices*))
             (new-vertex graph-id source-vertex-id)))
     (cond 
-        ((not (gethash (list 'vertex graph-id dest-vertex-id) *vertices*))
+        ((not (gethash (list graph-id dest-vertex-id) *vertices*))
             (new-vertex graph-id dest-vertex-id)))
+    (cond
+        ((gethash (list graph-id source-vertex-id dest-vertex-id) *arcs*)
+            (remhash (list graph-id source-vertex-id dest-vertex-id) *arcs*))
+        ((gethash (list graph-id dest-vertex-id source-vertex-id) *arcs*)
+            (remhash (list graph-id dest-vertex-id source-vertex-id) *arcs*)))
     (setf 
-        (gethash (list 'arc graph-id source-vertex-id dest-vertex-id weight) *arcs*)
+        (gethash (list graph-id source-vertex-id dest-vertex-id) *arcs*)
         (list 'arc graph-id source-vertex-id dest-vertex-id weight)))
 
 ;; Ritorna una lista di tutti gli archi presenti in graph-id.
@@ -80,10 +82,10 @@
             (error "Il grafo specificato non esiste.")))
     (let ((arcs ()))
         (maphash 
-            #'(lambda (&rest hash-entry) 
+            #'(lambda (key value) 
                 (cond 
-                    ((string= graph-id (car (cdr (car hash-entry))))
-                        (push (car hash-entry) arcs))))
+                    ((string= graph-id (car key))
+                        (push value arcs))))
             *arcs*)
         arcs))
 
@@ -92,25 +94,25 @@
     (cond 
         ((not (is-graph graph-id))
             (error "Il grafo specificato non esiste."))
-        ((not (gethash (list 'vertex graph-id vertex-id) *vertices*))
+        ((not (gethash (list graph-id vertex-id) *vertices*))
             (error "Il vertice specificato non esiste.")))
     (let ((neighbors ()))
         (maphash 
-            #'(lambda (&rest hash-entry) 
+            #'(lambda (key value) 
                 (cond 
-                    ((string= graph-id (car (cdr (car hash-entry)))) 
+                    ((string= graph-id (car key)) 
                         (cond 
                             ((numberp vertex-id)
                                 (cond
-                                    ((= vertex-id (car (cdr (cdr (car hash-entry))))) 
-                                        (push (car hash-entry) neighbors))
-                                    ((= vertex-id (car (cdr (cdr (cdr (car hash-entry)))))) 
-                                        (push (car hash-entry) neighbors))))
+                                    ((= vertex-id (car (cdr key))) 
+                                        (push value neighbors))
+                                    ((= vertex-id (car (cdr (cdr key)))) 
+                                        (push value neighbors))))
                                 (t (cond
-                                    ((string= vertex-id (car (cdr (cdr (car hash-entry))))) 
-                                        (push (car hash-entry) neighbors))
-                                    ((string= vertex-id (car (cdr (cdr (cdr (car hash-entry)))))) 
-                                        (push (car hash-entry) neighbors))))))))
+                                    ((string= vertex-id (car (cdr key))) 
+                                        (push value neighbors))
+                                    ((string= vertex-id (car (cdr (cdr key)))) 
+                                        (push value neighbors))))))))
             *arcs*)
         neighbors))
 
@@ -119,39 +121,39 @@
     (cond 
         ((not (is-graph graph-id))
             (error "Il grafo specificato non esiste."))
-        ((not (gethash (list 'vertex graph-id vertex-id) *vertices*))
+        ((not (gethash (list graph-id vertex-id) *vertices*))
             (error "Il vertice specificato non esiste.")))
     (let ((adjacent ()))
         (maphash 
             #'(lambda (&rest hash-entry) 
                 (cond 
-                    ((string= graph-id (car (cdr (car hash-entry)))) 
+                    ((string= graph-id (car (car hash-entry)))
                         (cond
                             ((numberp vertex-id)
                                 (cond 
-                                    ((= vertex-id (car (cdr (cdr (car hash-entry))))) 
+                                    ((= vertex-id (car (cdr (car hash-entry))))
                                         (push 
                                             (gethash 
-                                                (list 'vertex graph-id (car (cdr (cdr (cdr (car hash-entry)))))) 
+                                                (list graph-id (car (cdr (cdr (car hash-entry)))))
                                                 *vertices*) 
                                             adjacent))
-                                    ((= vertex-id (car (cdr (cdr (cdr (car hash-entry)))))) 
+                                    ((= vertex-id (car (cdr (cdr (car hash-entry)))))
                                         (push 
                                             (gethash 
-                                                (list 'vertex graph-id (car (cdr (cdr (car hash-entry))))) 
+                                                (list graph-id (car (cdr (car hash-entry))))
                                                 *vertices*) 
                                             adjacent))))
                             (t (cond 
-                                ((string= vertex-id (car (cdr (cdr (car hash-entry))))) 
+                                ((string= vertex-id (car (cdr (car hash-entry))))
                                     (push 
                                         (gethash 
-                                            (list 'vertex graph-id (car (cdr (cdr (cdr (car hash-entry)))))) 
+                                            (list graph-id (car (cdr (cdr (car hash-entry)))))
                                             *vertices*) 
                                         adjacent))
-                                ((string= vertex-id (car (cdr (cdr (cdr (car hash-entry)))))) 
+                                ((string= vertex-id (car (cdr (cdr (car hash-entry)))))
                                     (push 
                                         (gethash 
-                                            (list 'vertex graph-id (car (cdr (cdr (car hash-entry))))) 
+                                            (list graph-id (car (cdr (car hash-entry))))
                                             *vertices*) 
                                         adjacent))))))))
             *arcs*)
@@ -175,9 +177,6 @@
 ;; Rimuove tutto lo heap indicizzato da heap-id.
 (defun heap-delete (heap-id)
     (remhash heap-id *heaps*))
-
-;; TODO: Forse c'è da implementare anche heap-id? (e nel caso heap-size ed heap-actual-heap potrebbbero essere sbagliate,
-;;       in quanto dovrebbero prendere non l'id ma heap-rep)
 
 ;; Ritorna la dimensione dello heap
 (defun heap-size (heap-id)
@@ -362,13 +361,16 @@
 (defparameter *previous* 
     (make-hash-table :test #'equal))
 
+(defparameter *visited* 
+    (make-hash-table :test #'equal))
+
 ;; Dato un vertex-id di un grafo graph-id ritorna il peso minimo di un arco che connette 
 ;; vertex-id nell’albero minimo
 (defun mst-vertex-key (graph-id vertex-id)
     (or (gethash (list graph-id vertex-id) *vertex-key*)
         most-positive-double-float))
 
-;; Ritorna il vertice U “genitore” di V nel minimum spanning tree V
+;; Ritorna il vertice U "genitore" di V nel minimum spanning tree V
 (defun mst-previous (graph-id V)
     (or (gethash (list graph-id V) *previous*)
         nil))
@@ -376,30 +378,35 @@
 ;; Dopo la sua esecuzione la hash-table *vertex-key* contiene al suo interno le associazioni 
 ;; (graph-id V) => d per ogni V appartenente a graph-id. La hash-table *previous* contiene le 
 ;; associazioni (graph-id V) => U calcolate durante l’esecuzione dell’algoritmo di Prim.
-(defun heap-value-exists (heap size value &optional (index 0))
+(defun heap-old-key (heap size value &optional (index 0))
     (cond
         ((< index size)
             (cond
                 ((numberp value)
                     (cond
                         ((= value (car (cdr (aref heap index)))) (car (aref heap index)))
-                        (t (heap-value-exists heap size value (+ index 1)))))
+                        (t (heap-old-key heap size value (+ index 1)))))
                 (t (cond
                     ((string= value (car (cdr (aref heap index)))) (car (aref heap index)))
-                    (t (heap-value-exists heap size value (+ index 1)))))))))
+                    (t (heap-old-key heap size value (+ index 1)))))))))
 
 (defun mst-update-node (graph-id vertex-id parent-id weight)
-    (let ((old-key (heap-value-exists (heap-actual-heap graph-id) (heap-size graph-id) vertex-id)))
-        (cond ((not (null old-key)) (cond
-                ((< weight (mst-vertex-key graph-id vertex-id))
-                    (setf (gethash (list graph-id vertex-id) *vertex-key*) weight)
-                    (setf (gethash (list graph-id vertex-id) *previous*) parent-id)
-                    (heap-modify-key graph-id weight old-key vertex-id)))))))
+    (cond
+        ((not (gethash (list graph-id vertex-id) *visited*))
+            (let ((old-key (heap-old-key (heap-actual-heap graph-id) (heap-size graph-id) vertex-id)))
+                (cond ((not (null old-key)) (cond
+                        ((< weight (mst-vertex-key graph-id vertex-id))
+                            (setf (gethash (list graph-id vertex-id) *vertex-key*) weight)
+                            (setf (gethash (list graph-id vertex-id) *previous*) parent-id)
+                            (heap-modify-key graph-id weight old-key vertex-id)))))))))
 
 (defun mst-build-tree (graph-id)
     (cond
         ((heap-not-empty graph-id)
             (let ((head (car (cdr (heap-extract graph-id)))))
+                (setf
+                    (gethash (list graph-id head) *visited*)
+                    (list graph-id head))
                 (mapc
                     #'(lambda (arc)
                         (cond
@@ -423,7 +430,7 @@
     (cond 
         ((not (is-graph graph-id))
             (error "Il grafo specificato non esiste."))
-        ((not (gethash (list 'vertex graph-id source) *vertices*))
+        ((not (gethash (list graph-id source) *vertices*))
             (error "Il vertice specificato non esiste.")))
     (mapc
         #'(lambda (vertex)
@@ -434,16 +441,6 @@
     (setf (gethash (list graph-id source) *vertex-key*) most-positive-double-float)
     (setf (gethash (list graph-id source) *previous*) nil)
     (mst-build-tree graph-id))
-
-(defun a ()
-    (maphash
-        #'(lambda (key value)
-            (print (cons key value)))
-        *vertex-key*)
-    (maphash
-        #'(lambda (key value)
-            (print (cons key value)))
-        *previous*))
 
 ;; Questa funzione ritorna una lista degli archi del MST ordinata secondo un attraversamento 
 ;; preorder dello stesso, fatta rispetto al peso dell’arco. 
@@ -483,11 +480,9 @@
                 (t (cond 
                     ((string> (car x) (car y)) t)))))))
 
-(defun graph-find-arc (graph-id source-vertex-id dest-vertex-id weight)
-    (or (gethash (list 'arc graph-id source-vertex-id dest-vertex-id weight) 
-            *arcs*)
-        (gethash (list 'arc graph-id dest-vertex-id source-vertex-id weight) 
-            *arcs*)))
+(defun graph-find-arc (graph-id source-vertex-id dest-vertex-id)
+    (or (gethash (list graph-id source-vertex-id dest-vertex-id) *arcs*)
+        (gethash (list graph-id dest-vertex-id source-vertex-id) *arcs*)))
 
 (defun mst-preorder-tree (graph-id source childs preorder-tree)
     (cond 
@@ -495,8 +490,7 @@
             (let ((sub-tree (mst-preorder-tree graph-id (car (car childs))
                 (sort (mst-get-childs graph-id (car (car childs))) 'mst-sort-childs)
                 preorder-tree)))
-                (push (graph-find-arc graph-id source 
-                    (car (car childs)) (car (cdr (car childs)))) sub-tree)
+                (push (graph-find-arc graph-id source (car (car childs))) sub-tree)
                 (cond 
                     ((not (null (cdr childs)))
                     (mst-preorder-tree graph-id source (cdr childs) sub-tree))
