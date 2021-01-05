@@ -23,21 +23,6 @@
   (or (gethash graph-id *graphs*)
     (setf (gethash graph-id *graphs*) graph-id)))
 
-(defun delete-graph (graph-id)
-  "Rimuove tutto il grafo (archi e vertici compresi) dalle rispettive hash 
-    table e ritorna NIL."
-  (remhash graph-id *graphs*)
-  (maphash 
-    #'(lambda (&rest hash-entry) 
-      (cond ((string= graph-id (car (car hash-entry)))
-        (remhash (car hash-entry) *vertices*))))
-    *vertices*)
-  (maphash 
-    #'(lambda (&rest hash-entry) 
-      (cond ((string= graph-id (car (car hash-entry)))
-        (remhash (car hash-entry) *arcs*))))
-    *arcs*))
-
 (defun new-vertex (graph-id vertex-id)
   "Crea un nuovo vertice chiamato vertex-id relativo al grafo graph-id e ritorna
     la rappresentazione del vertice. Se il grafo graph-id non esiste al momento 

@@ -146,3 +146,33 @@
       (error "Il vertice specificato non e' la radice dell'MST")))
   (mst-preorder-tree graph-id source 
     (sort (mst-get-childs graph-id source) 'mst-sort-childs) ()))
+
+(defun delete-graph (graph-id)
+  "Rimuove tutto il grafo (compresi archi, vertici ed MST) dalle rispettive hash 
+    table e ritorna NIL."
+  (remhash graph-id *graphs*)
+  (maphash 
+    #'(lambda (&rest hash-entry) 
+      (cond ((string= graph-id (car (car hash-entry)))
+        (remhash (car hash-entry) *vertices*))))
+    *vertices*)
+  (maphash 
+    #'(lambda (&rest hash-entry) 
+      (cond ((string= graph-id (car (car hash-entry)))
+        (remhash (car hash-entry) *arcs*))))
+    *arcs*)
+  (maphash 
+    #'(lambda (&rest hash-entry) 
+      (cond ((string= graph-id (car (car hash-entry)))
+        (remhash (car hash-entry) *vertex-key*))))
+    *vertex-key*)
+  (maphash 
+    #'(lambda (&rest hash-entry) 
+      (cond ((string= graph-id (car (car hash-entry)))
+        (remhash (car hash-entry) *previous*))))
+    *previous*)
+  (maphash 
+    #'(lambda (&rest hash-entry) 
+      (cond ((string= graph-id (car (car hash-entry)))
+        (remhash (car hash-entry) *visited*))))
+    *visited*))
