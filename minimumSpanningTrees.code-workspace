@@ -6,6 +6,9 @@
 	],
 	"settings": {
 		"terminal.integrated.shell.windows": "C:\\Program Files\\Steel Bank Common Lisp\\2.0.0\\sbcl.exe",
-		"terminal.integrated.shellArgs.windows": ["--load", "minimum-spanning-trees.lisp"]
+		"terminal.integrated.shellArgs.windows": ["--load", "mst.lisp"],
+		"editor.rulers": [
+			80
+		]
 	},
 }

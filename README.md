@@ -1,11 +1,11 @@
-# Minimum-Spanning-Trees-LISP
+# Minimum Spanning Trees LISP
 
 Progetto Linguaggi di Programmazione, A.A. 2020/2021  
 Libreria Prolog: [Minimum Spanning Trees Prolog](https://github.com/Deivmercer/Minimum-Spanning-Trees-Prolog)
 
 ## Introduzione
 
-Un problema che appare spesso sotto varie guise consiste nel connettere diversi “punti” in modo “equivalente”, ad esempio collegandoli con dei fili ma senza creare dei cicli. Un altro problema tipico è quello di calcolare il percorso più breve da un punto a un altro di una mappa1.  
+Un problema che appare spesso sotto varie guise consiste nel connettere diversi “punti” in modo “equivalente”, ad esempio collegandoli con dei fili ma senza creare dei cicli. Un altro problema tipico è quello di calcolare il percorso più breve da un punto a un altro di una mappa.  
 Vi sono diversi algoritmi in grado di risolvere questi problemi, noti in letteratura come il “Minimum Spanning Tree” (MST Problem, cfr., [CLR+09] capitolo 23) ed il “Single Source Shortest Path Problem” (SSSP Problem, cfr., [CLR+09] capitolo 24).  
 Lo scopo di questo progetto è di implementare l’algoritmo di Prim (cfr., [CLR+09] 23.2) per la soluzione del problema MST per grafi non-diretti e connessi con pesi non negativi.  
 Per procedere all’implementazione di questi algoritmi è necessario – e, di fatto, è la parte principale del progetto – produrre un’implementazione di un MINHEAP (o MINPRIORITYQUEUE).  
