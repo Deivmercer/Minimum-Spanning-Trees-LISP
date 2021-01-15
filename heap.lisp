@@ -74,9 +74,9 @@ heap-id e l'heap soddisfa la proprietà di heap."
     (cond ((= size (length heap))
            (setf (gethash heap-id *heaps*)
                  (list 'heap heap-id size (adjust-array heap (+ size 1))))))
-    (setf (aref heap size) (list K V))
+    (setf (aref (heap-actual-heap heap-id) size) (list K V))
     (setf (gethash heap-id *heaps*)
-          (list 'heap heap-id (+ size 1) heap))
+          (list 'heap heap-id (+ size 1) (heap-actual-heap heap-id)))
     (heapify-insert heap-id size)))
 
 (defun smallest (heap index-x index-y size)
