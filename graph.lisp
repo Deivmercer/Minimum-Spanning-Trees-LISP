@@ -7,7 +7,7 @@
 ;;; Tabella contenente le rappresentazioni dei grafi.
 (defparameter *graphs* (make-hash-table :test #'equal))
 
-;;; Tabella contenente le rappresentazioni dei grafi.
+;;; Tabella contenente le rappresentazioni dei vertici.
 (defparameter *vertices* (make-hash-table :test #'equal))
 
 ;;; Tabella contenente le rappresentazioni degli archi.
@@ -27,7 +27,9 @@ ritorna graph-id."
   "Crea un nuovo vertice chiamato vertex-id relativo al grafo graph-id e ritorna
 la rappresentazione del vertice. Se il grafo graph-id non esiste al momento 
 della chiamata allora verrà creato."
-  (cond ((not (is-graph graph-id))
+  (cond ((null vertex-id)
+          (error "Il vertex-id non puo' essere nullo."))
+        ((not (is-graph graph-id))
          (new-graph graph-id)))
   (setf (gethash (list graph-id vertex-id) *vertices*) 
         (list 'vertex graph-id vertex-id)))

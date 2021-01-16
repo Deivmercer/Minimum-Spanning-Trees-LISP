@@ -28,6 +28,22 @@ vertex-id nell'MST."
   (or (gethash (list graph-id V) *previous*)
       nil))
 
+(defun delete-mst (graph-id)
+  "Rimuove le componenti dell'MST dalle rispettive hash table e ritorna NIL."
+  (remhash graph-id *heaps*)
+  (maphash (lambda (&rest hash-entry) 
+             (cond ((string= graph-id (car (car hash-entry)))
+                    (remhash (car hash-entry) *vertex-key*))))
+           *vertex-key*)
+  (maphash (lambda (&rest hash-entry) 
+             (cond ((string= graph-id (car (car hash-entry)))
+                    (remhash (car hash-entry) *previous*))))
+           *previous*)
+  (maphash (lambda (&rest hash-entry) 
+             (cond ((string= graph-id (car (car hash-entry)))
+                    (remhash (car hash-entry) *visited*))))
+           *visited*))
+
 (defun mst-update-node (graph-id vertex-id parent-id weight)
   "Aggiorna il peso dell'arco del grafo graph-id che connette il vertice 
 vertex-id all'interno dell'MST se weight è più piccolo del peso attuale e
@@ -61,6 +77,7 @@ vertice source e ritorna NIL."
          (error "Il grafo specificato non esiste."))
         ((not (gethash (list graph-id source) *vertices*))
          (error "Il vertice specificato non esiste.")))
+  (delete-mst graph-id)
   (new-heap graph-id (length (graph-vertices graph-id)))
   (mapc (lambda (vertex)
           (heap-insert graph-id most-positive-double-float 
@@ -153,15 +170,4 @@ table e ritorna NIL."
              (cond ((string= graph-id (car (car hash-entry)))
                     (remhash (car hash-entry) *arcs*))))
            *arcs*)
-  (maphash (lambda (&rest hash-entry) 
-             (cond ((string= graph-id (car (car hash-entry)))
-                    (remhash (car hash-entry) *vertex-key*))))
-           *vertex-key*)
-  (maphash (lambda (&rest hash-entry) 
-             (cond ((string= graph-id (car (car hash-entry)))
-                    (remhash (car hash-entry) *previous*))))
-           *previous*)
-  (maphash (lambda (&rest hash-entry) 
-             (cond ((string= graph-id (car (car hash-entry)))
-                    (remhash (car hash-entry) *visited*))))
-           *visited*))
+  (delete-mst graph-id))
