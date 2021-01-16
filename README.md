@@ -21,8 +21,8 @@ Per utilizzare la libreria MST è necessario definire un grafo usando le funzion
 Dopodiché, per lanciare l'algoritmo di Prim sul grafo che è stato definito, è sufficiente utilizzare le seguenti funzioni:
 
 ```Lisp
-(mst-prim grafo vertice-sorgente)   ; Lancia l'algoritmo
-(mst-get grafo vertice-sorgente)    ; Recupera il risultato
+(mst-prim 'grafo 'vertice-sorgente)   ; Lancia l'algoritmo
+(mst-get 'grafo 'vertice-sorgente)    ; Recupera il risultato
 ```
 
 mst-get ritorna una lista contenente i nodi dell'MST visitati in preordine. Il vertice-sorgente utilizzato nelle due funzioni deve essere identico.

@@ -126,24 +126,25 @@ e l'heap soddisfa ancora la proprietà di heap."
     current-head))
 
 (defun mapheap (func heap size &optional (index 1))
-  "Applica la funzione func ad ogni elemento dell'heap e ritorna NIL."
+  "Visita l'heap in preordine ed applica la funzione func ad ogni elemento 
+dell'heap e ritorna NIL."
   (cond ((< (- index 1) size)
          (funcall func (aref heap (- index 1)) (- index 1))
          (mapheap func heap size (* index 2))
          (mapheap func heap size (+ (* index 2) 1)))))
 
-(defun modify-entry (heapid heap size new-key old-key value &optional (index 0))
-  "Modifica il primo elemento la cui chiave è old-key ed il valore è value
-impostando new-key come chiave."
+(defun modify-entry (heap-id heap size new-key old-key val &optional (index 0))
+  "Modifica il primo elemento all'interno dell'heap heap-id la cui chiave è
+  old-key ed il valore è val, impostando new-key come chiave."
   (cond ((< index size)
-         (cond ((equal (aref heap index) (list old-key value))
+         (cond ((equal (aref heap index) (list old-key val))
                 (setf (aref heap index) 
-                      (list new-key value))
+                      (list new-key val))
                 (cond ((< new-key old-key)
-                       (heapify-insert heapid index) t)
+                       (heapify-insert heap-id index) t)
                       ((> new-key old-key)
                        (heapify heap index size) t)))     
-               (t (modify-entry heapid heap size new-key old-key value 
+               (t (modify-entry heap-id heap size new-key old-key val 
                                 (+ index 1)))))))
 
 (defun heap-modify-key (heap-id new-key old-key V)
