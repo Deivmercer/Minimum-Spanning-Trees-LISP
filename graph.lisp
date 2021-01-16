@@ -134,20 +134,20 @@ vertex-id."
                               (gethash (list graph-id 
                                              (arc-source value))
                                        *vertices*) 
-                              adjacent))))
-                     (t (cond ((string= vertex-id (arc-source value))
-                               (push 
-                                (gethash (list graph-id 
+                              adjacent))
+                            (t (cond ((string= vertex-id (arc-source value))
+                                      (push 
+                                       (gethash (list graph-id 
+                                                      (arc-destination value))
+                                                *vertices*) 
+                                       adjacent))
+                                     ((string= vertex-id 
                                                (arc-destination value))
-                                         *vertices*) 
-                                adjacent))
-                              ((string= vertex-id 
-                                        (arc-destination value))
-                               (push 
-                                (gethash (list graph-id 
-                                               (arc-source value))
-                                         *vertices*) 
-                                adjacent))))))
+                                      (push 
+                                       (gethash (list graph-id 
+                                                      (arc-source value))
+                                                *vertices*) 
+                                       adjacent))))))))
              *arcs*)
     adjacent))
 
